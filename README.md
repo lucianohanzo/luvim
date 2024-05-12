@@ -1,2 +1,2 @@
-# bash
+# luvim
 Scripts em linux bash
