@@ -110,6 +110,7 @@ set nowrap
 " Coloca o tema dracula baixado na pasta (~/.vim/pack/themes/start)
 colorscheme dracula' > ~/.vimrc
 #==================================================
+
 # Mensagem final.
 clear && echo "Configurações do Vim aplicadas!"
 
