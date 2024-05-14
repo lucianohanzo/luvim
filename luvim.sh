@@ -65,7 +65,7 @@ Teste=$(echo "$Versao >= 8.2" | bc -l)
 # Instala a pasta dependendo da condição.
 if [ $Teste -ge 1 ]
 then
-    if [ ! -d ~/.vim/pack/themes/opt/dracula ]
+    if [ ! -d ~/.vim/pack/themes/start/dracula ]
     then
         mkdir -p ~/.vim/pack/themes/start
         git clone https://github.com/dracula/vim.git \
@@ -76,7 +76,7 @@ else
     then
         mkdir -p ~/.vim/pack/themes/start
         git clone https://github.com/dracula/vim.git \
-	        ~/.vim/pack/themes/start/dracula 2> /dev/null
+	        ~/.vim/pack/themes/opt/dracula 2> /dev/null
     fi
 fi
 #==================================================
