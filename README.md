@@ -10,7 +10,7 @@ Deixando assim uma ambiente mais agradavel.
 #=== Como executar ===#
 Ao baixar o script ou copiando o código, de permissão de execução para o 
 arquivo.
-# chmod +x luvim.sh
+#=== chmod +x luvim.sh
 Depois execute o script.
 ./luvim.sh
 
