@@ -21,5 +21,4 @@ estejam instalados.
 Também será criado os arquivos ".vimrc" na pasta home do usuário e criado 
 algumas pastas no sistema.
 Caso tenha algum erro de instalação tente deletar os diretórios.
-"~/.vim/pack/themes/start/*"
-"~/.vim/pack/themes/opt/*"
+"~/.vim/pack/themes/start/*" "~/.vim/pack/themes/opt/*"
