@@ -56,7 +56,7 @@ hi SpecialChar        guibg=NONE         guifg=#ffffff
 hi SpecialComment     guibg=NONE         guifg=#ffffff
 hi Special            guibg=NONE         guifg=#ffffff
 hi SpecialKey         guibg=NONE         guifg=#ffffff
-hi SpellBad           guibg=bcbcbc       guifg=#000000
+hi SpellBad           guibg=#bcbcbc       guifg=#000000
 hi SpellCap           guibg=NONE         guifg=#bcbcbc
 hi SpellLocal         guibg=NONE         guifg=#bcbcbc
 hi SpellRare          guibg=NONE         guifg=#bcbcbc
