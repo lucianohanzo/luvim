@@ -83,32 +83,16 @@ fi
 
 # Coloca informações no arquivo '.vimrc', mudando o padrão do Vim.
 echo '
-" tabulação com 4 espaços.
-set tabstop=4
-
-" Troca tabulação por espaços.
-set expandtab
-
-" Tenta detectar o tipo de arquivo.
-filetype on
-
-" Identação automatica.
-" filetype indent on
-
-" Ativar o realce de sintaxe.
-syntax on
-
-" Numera as linhas.
-set number
-
-" Deixa detacado a linha corespondente.
-set cursorline
-
-" Não quebrar linhas.
-set nowrap
-
-" Coloca o tema dracula baixado na pasta (~/.vim/pack/themes/start)
-colorscheme dracula' > ~/.vimrc
+set tabstop=4        " tabulação com 4 espaços.
+set expandtab        " Troca tabulação por espaços.
+filetype on          " Tenta detectar o tipo de arquivo.
+" filetype indent on " Identação automatica.
+syntax on            " Ativar o realce de sintaxe.
+set number           " Numera as linhas.
+set cursorline       " Deixa detacado a linha corespondente.
+set nowrap           " Não quebrar linhas.
+colorscheme dracula  " Coloca o tema dracula baixado na pasta (~/.vim/pack/themes/start)
+set colorcolumn=80' > ~/.vimrc
 #==================================================
 
 # Mensagem final.
