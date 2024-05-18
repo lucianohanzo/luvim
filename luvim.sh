@@ -147,6 +147,6 @@ clear && echo "Arquivos e diretórios criados!" && sleep 4 && clear
 #===============================================================================
 
 echo "Instalação finalizada!" && echo -e "\n"
-read -p "Aperte qualquer coisa para finaliza! " && clear
+read -p "Aperte \"Enter\" para finaliza! " && clear
 
 # Fim do script.
