@@ -1,101 +1,151 @@
 #!/bin/bash
 
-# Testa se tem internet.
-Internet=$(ping google.com -c1 2> /dev/null)
-if [ ! "$Internet" ]
-then
-    clear && echo "Não tem internet, ou sem DNS."
-    exit 2
+#=== Boas Vindas ===#
+clear && echo -e "Bem vindo ao instalador \"luvim.sh\".\n" && sleep 1
+clear
+
+#=== Verifica se tem internet. ===#
+Internet=$(ping -c1 google.com > /dev/null 2> /dev/null)
+
+if [ "$Internet" ]; then
+    echo "Não tem Internet ou sem DNS configurado!"
+    exit 1
 fi
-#==================================================
+#===============================================================================
 
-# Verifica se o "Vim" está instalado.
-InstaVim=$(dpkg -l | grep "ii  vim" | head -n1 |
-	    tr -s "  " " " | cut -f2 -d" " | grep "^vim$")
-if [ ! "$InstaVim" ]
-then
-    clear && echo "Vim não está instalado!"
-    echo "Deseja instalar o vim?"
-    echo -e "1 - Instalar o Vim\n* - não instalar"
-    
-    read -p "Qual a sua escolha : " Escolha1
-    if [ $Escolha1 = 1 ]
-    then
-        clear && apt install -y vim
-	clear && echo "Vim instalado!" && sleep 4
-    else
-	clear && echo "Sayonara!"
-	exit 3
-    fi
+#=== Verifica se o VIM está instalado ===#
+InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
+           cut -d" " -f2 | grep "^vim$")
 
+if [ ! "$InstaVim" ]; then
+    Bandeira=1
+    while [ $Bandeira -eq 1 ]; do
+        clear && echo -e "VIM não está instalado!\n" && sleep 1
+        echo "Deseja instalar o VIM?"
+        echo -e "1 - Sim\n2 - Não"
+        read -p "Qual sua resposta : " Resposta
+        if [ "$Resposta" -eq 1 ]; then
+            clear && echo "Instalado o \"luvim\"..." && sleep 1 && clear
+            sudo apt install -y vim &> /dev/null
+            InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
+                       cut -d" " -f2 | grep "^vim$")
+            if [ ! "$InstaVim" ]; then
+                clear
+                echo "O VIM não foi instalado, atualize os repositórios!"
+                sleep 1 && clear && exit 2
+            else
+                clear && echo "VIM, instalado com sucesso!" && sleep 1
+            fi
+            Bandeira=0
+        elif [ "$Resposta" -eq 2 ]; then
+            clear && echo "Saindo do \"luvim.sh\"..." && sleep 1 && clear
+            Bandeira=0
+        else
+            clear && echo "Resposta Inválida!" && sleep 1
+        fi
+    done
 fi
-#==================================================
+#===============================================================================
 
-# Verifica se o "Git" está instalado.
-InstaGit=$(dpkg -l | grep "ii  git" | head -n1 |
-           tr -s "  " " " | cut -f2 -d" " | grep "^git$")
-if [ ! "$InstaGit" ]
-then
-    clear && echo "Git não está instalado!"
-    echo "Deseja instalar o git?"
-    echo -e "1 - Instalar o Git\n* - não instalar"
-    
-    read -p "Qual a sua escolha : " Escolha2
-    if [ $Escolha2 = 1 ]
-    then
-        clear && apt install -y git
-	clear && echo "Git instalado!" && sleep 4
-    else
-	clear && echo "Sayonara!"
-	exit 3
-    fi
+#=== Cria o arquivo ~/.vimrc e os diretórios do VIM. ===#
+clear && echo "Criando arquivos e diretórios do VIM..." && sleep 4 && clear
 
-fi
-#==================================================
+> ~/.vimrc # Cria arquivo ".vimrc".
+mkdir -p ~/.vim/colors/ # Cria o diretório "~/.vim/colors/".
+> ~/.vim/colors/dracula_x.vim # Cria o arquivo "dracula_x.vim".
+#===============================================================================
 
-# Criar arquivo de configuração vim.
-> ~/.vimrc
+#=== Edita o arquivo ~/.vim/colors/dracula_x.vim ===#
+echo "
+set background=dark
 
-#=== Cria pasta de configuração de temas. ===#
-    # Obtem a versão do vim.
-Versao=$(vim --version | head -n1 | cut -f5 -d" ")
-    # Retorna "1" caso a versão do vim seja maior que 8.2.
-Teste=$(echo "$Versao >= 8.2" | bc -l)
+hi clear
 
-# Instala a pasta dependendo da condição.
-if [ $Teste -ge 1 ]
-then
-    if [ ! -d ~/.vim/pack/themes/start/dracula ]
-    then
-        mkdir -p ~/.vim/pack/themes/start
-        git clone https://github.com/dracula/vim.git \
-	        ~/.vim/pack/themes/start/dracula 2> /dev/null
-    fi
-else
-    if [ ! -d ~/.vim/pack/themes/opt/dracula ]
-    then
-        mkdir -p ~/.vim/pack/themes/start
-        git clone https://github.com/dracula/vim.git \
-	        ~/.vim/pack/themes/opt/dracula 2> /dev/null
-    fi
-fi
-#==================================================
+\" Cor de fundo
+hi Normal guifg=NONE guibg=#282a36 gui=NONE cterm=NONE
 
-# Coloca informações no arquivo '.vimrc', mudando o padrão do Vim.
-echo '
-set tabstop=4        " tabulação com 4 espaços.
-set expandtab        " Troca tabulação por espaços.
-filetype on          " Tenta detectar o tipo de arquivo.
-" filetype indent on " Identação automatica.
-syntax on            " Ativar o realce de sintaxe.
-set number           " Numera as linhas.
-set cursorline       " Deixa detacado a linha corespondente.
-set nowrap           " Não quebrar linhas.
-colorscheme dracula  " Coloca o tema dracula baixado na pasta (~/.vim/pack/themes/start)
-set colorcolumn=80' > ~/.vimrc
-#==================================================
+\" Cor da linha da coluna vertical.
+hi ColorColumn guifg=NONE guibg=#2f313d gui=NONE cterm=NONE
+  
+\" Valore Boleanos como true e false
+hi Boolean guifg=#707df9 guibg=NONE gui=NONE cterm=NONE
 
-# Mensagem final.
-clear && echo "Configurações do Vim aplicadas!"
+\" Número da linha.
+hi LineNr guifg=#6272a4 guibg=#282a36 gui=NONE cterm=NONE
 
-# Fim do script
+\" Comentários
+hi Comment guifg=#5e71a4 guibg=NONE gui=NONE cterm=NONE
+
+\" Alguns comandos especiais do linux e comandos com \ em outras linguagens.
+hi Special guifg=#ff78a1 guibg=NONE gui=NONE cterm=NONE
+
+\" Tipos como int, bool, double...
+hi Type guifg=#d056b5 guibg=NONE gui=NONE cterm=NONE
+
+\" Linha do cursor.
+hi CursorLine guifg=NONE guibg=#21232f gui=NONE cterm=NONE
+
+\" Linha do cursor do número da linha.
+hi CursorLineNr guifg=NONE guibg=#21232f gui=NONE cterm=NONE
+
+\" Nome dos links em HTML
+hi Underlined guifg=#ffffff guibg=NONE gui=NONE cterm=NONE
+
+\" Instruções ou declarações como if,else entre outros. IMPORTANTE!
+hi Statement guifg=#ff79c6 guibg=NONE gui=NONE cterm=NONE
+
+\" Strings, números entre outros. IMPORTANTE!
+hi Constant guifg=#ffff85 guibg=NONE gui=NONE cterm=NONE
+
+\" Identicadores, sinal de < > em HTML, True e False em python. IMPORTANTE!
+hi Identifier guifg=#ffffff guibg=NONE gui=NONE cterm=italic
+
+\" Pré Processamento.
+hi PreProc guifg=#ff79c6 guibg=NONE gui=NONE cterm=NONE
+
+\" Títulos e Sub-Títulos do HTML
+hi Title guifg=#ffffff guibg=NONE gui=NONE cterm=NONE
+
+\" Cores de alteração dos modos do VIM.
+hi ModeMsg guifg=#ffacff guibg=#484848 gui=NONE cterm=bold
+
+\" Sintaxe de erros do VIM.
+hi Error guifg=#ff2000 guibg=NONE gui=NONE cterm=underline
+
+\" Modo de visualização do VIM 
+hi Visual guifg=NONE guibg=#353744 gui=NONE cterm=italic
+
+" > ~/.vim/colors/dracula_x.vim
+
+#===============================================================================
+
+#=== Edita o arquivo ~/.vimrc ===#
+echo "
+set tabstop=4         \" tabulação com 4 espaços.
+
+set expandtab         \" Troca tabulação por espaços.
+
+filetype on           \" Tenta detectar o tipo de arquivo.
+
+\" filetype indent on  \" Identação automatica.
+
+syntax on             \" Ativar o realce de sintaxe.
+
+set number            \" Numera as linhas.
+
+set cursorline        \" Deixa destacado a linha corespondente.
+
+set nowrap            \" Não quebrar linhas.
+
+set colorcolumn=80    \" Coluna vertical no caractere 80
+
+set termguicolors     \" Aceita esquema de cores em hexadecimal.
+
+colorscheme dracula_x \" Usa o tema dracula_x da pasta (~/.vim/colors).
+" > ~/.vimrc # Envia todas essas informações para o arquivo ~/.vimrc
+clear && echo "Arquivos e diretórios criados!" && sleep 4 && clear
+#===============================================================================
+
+echo "Instalação finalizada!" && sleep 4 && clear
+
+# Fim do script.
