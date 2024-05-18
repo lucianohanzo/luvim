@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #=== Boas Vindas ===#
-clear && echo -e "Bem vindo ao instalador \"luvim.sh\".\n" && sleep 1
+clear && echo -e "Bem vindo ao instalador \"luvim.sh\".\n" && sleep 5
 clear
 
 #=== Verifica se tem internet. ===#
@@ -20,28 +20,28 @@ InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
 if [ ! "$InstaVim" ]; then
     Bandeira=1
     while [ $Bandeira -eq 1 ]; do
-        clear && echo -e "VIM não está instalado!\n" && sleep 1
+        clear && echo -e "VIM não está instalado!\n" && sleep 2
         echo "Deseja instalar o VIM?"
         echo -e "1 - Sim\n2 - Não"
         read -p "Qual sua resposta : " Resposta
         if [ "$Resposta" -eq 1 ]; then
-            clear && echo "Instalado o \"luvim\"..." && sleep 1 && clear
+            clear && echo "Instalado o \"VIM\"..." && sleep 3 && clear
             sudo apt install -y vim &> /dev/null
             InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
                        cut -d" " -f2 | grep "^vim$")
             if [ ! "$InstaVim" ]; then
                 clear
                 echo "O VIM não foi instalado, atualize os repositórios!"
-                sleep 1 && clear && exit 2
+                sleep 5 && clear && exit 2
             else
-                clear && echo "VIM, instalado com sucesso!" && sleep 1
+                clear && echo "VIM, instalado com sucesso!" && sleep 4
             fi
             Bandeira=0
         elif [ "$Resposta" -eq 2 ]; then
-            clear && echo "Saindo do \"luvim.sh\"..." && sleep 1 && clear
+            clear && echo "Saindo do \"luvim.sh\"..." && sleep 4 && clear
             Bandeira=0
         else
-            clear && echo "Resposta Inválida!" && sleep 1
+            clear && echo "Resposta Inválida!" && sleep 4
         fi
     done
 fi
@@ -146,6 +146,7 @@ colorscheme dracula_x \" Usa o tema dracula_x da pasta (~/.vim/colors).
 clear && echo "Arquivos e diretórios criados!" && sleep 4 && clear
 #===============================================================================
 
-echo "Instalação finalizada!" && sleep 4 && clear
+echo "Instalação finalizada!" && echo -e "\n"
+read -p "Aperte qualquer coisa para finaliza! " && clear
 
 # Fim do script.
