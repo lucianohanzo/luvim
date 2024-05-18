@@ -10,7 +10,7 @@ Deixando assim uma ambiente mais agradavel.
 <p>#=== Como executar ===#</p>
 Ao baixar o script ou copiando o código, de permissão de execução para o 
 arquivo.
-chmod +x luvim.sh
+<p>chmod +x luvim.sh</p>
 Depois execute o script.
 <p>./luvim.sh</p>
 
