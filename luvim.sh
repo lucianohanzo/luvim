@@ -26,12 +26,11 @@ if [ ! "$InstaVim" ]; then
         read -p "Qual sua resposta : " Resposta
         if [ "$Resposta" -eq 1 ]; then
             clear && echo "Instalado o \"VIM\"..." && sleep 3 && clear
-            sudo apt install -y vim &> /dev/null
-            InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
-                       cut -d" " -f2 | grep "^vim$")
-            if [ ! "$InstaVim" ]; then
+            sudo apt install -y vim 2&> /dev/null
+            InstaVim=$(dpkg --get-selections | tr -s "\t" | cut -f1 | grep vim$)
+            if [ "$InstaVim" != "vim" ]; then
                 clear
-                echo "O VIM não foi instalado, atualize os repositórios!"
+                echo "O VIM não foi instalado, atualize os repositórios! \"DPKG\""
                 sleep 5 && clear && exit 2
             else
                 clear && echo "VIM, instalado com sucesso!" && sleep 4
