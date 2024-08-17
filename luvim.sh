@@ -5,7 +5,7 @@ clear && echo -e "Bem vindo ao instalador \"luvim.sh\".\n" && sleep 5
 clear
 
 #=== Verifica se tem internet. ===#
-Internet=$(ping -c1 google.com > /dev/null 2> /dev/null)
+Internet=$(ping -c1 google.com > /dev/null 2>&1)
 
 if [ "$Internet" ]; then
     echo "Não tem Internet ou sem DNS configurado!"
@@ -14,10 +14,9 @@ fi
 #===============================================================================
 
 #=== Verifica se o VIM está instalado ===#
-InstaVim=$(dpkg -l | grep "ii  vim" | tr -s "  " " " |
-           cut -d" " -f2 | grep "^vim$")
+InstaVim=$(dpkg --get-selections | tr -s "\t" | cut -f1 | grep vim$)
 
-if [ ! "$InstaVim" ]; then
+if [ "$InstaVim" != "vim"]; then
     Bandeira=1
     while [ $Bandeira -eq 1 ]; do
         clear && echo -e "VIM não está instalado!\n" && sleep 2
@@ -26,7 +25,7 @@ if [ ! "$InstaVim" ]; then
         read -p "Qual sua resposta : " Resposta
         if [ "$Resposta" -eq 1 ]; then
             clear && echo "Instalado o \"VIM\"..." && sleep 3 && clear
-            sudo apt install -y vim 2&> /dev/null
+            sudo apt install -y vim > /dev/null 2>&1
             InstaVim=$(dpkg --get-selections | tr -s "\t" | cut -f1 | grep vim$)
             if [ "$InstaVim" != "vim" ]; then
                 clear
