@@ -1,60 +1,80 @@
 #!/bin/bash
 
-#=== Boas Vindas ===#
-clear && echo -e "Bem vindo ao instalador \"luvim.sh\".\n" && sleep 5
-clear
+#==============================================================================#
+# Programa para personalização do vim.
+# Finalidade 01 : Instala o VIM.
+# Finalidade 02 : Altera o comportamento do VIM.
+# Finalidade 03 : Altera o tema do VIM para (dracula_x).
+#
+# Versão : 2.0
+#
+# AUTOR   : LUCIANO PEREIRA DE SOUZA
+# REVISOR : 
+#
+# Licença : GPL
+#==============================================================================#
 
-#=== Verifica se tem internet. ===#
-Internet=$(ping -c1 google.com > /dev/null 2>&1)
+#==============================================================================#
+# Arquivos de Configuração.
+# ~/.vimrc
+# 
+# Arquivo de Tema.
+# ~/.vim/colors/dracula_x.vim
+#==============================================================================#
 
-if [ "$Internet" ]; then
-    echo "Não tem Internet ou sem DNS configurado!"
-    exit 1
-fi
-#===============================================================================
 
-#=== Verifica se o VIM está instalado ===#
-InstaVim=$(dpkg --get-selections | tr -s "\t" | cut -f1 | grep vim$)
+# Argumentos permitidos.
+parametros=(-h --help -V --version -i --install -c --config -t --theme)
 
-if [ "$InstaVim" != "vim"]; then
-    Bandeira=1
-    while [ $Bandeira -eq 1 ]; do
-        clear && echo -e "VIM não está instalado!\n" && sleep 2
-        echo "Deseja instalar o VIM?"
-        echo -e "1 - Sim\n2 - Não"
-        read -p "Qual sua resposta : " Resposta
-        if [ "$Resposta" -eq 1 ]; then
-            clear && echo "Instalado o \"VIM\"..." && sleep 3 && clear
-            sudo apt install -y vim > /dev/null 2>&1
-            InstaVim=$(dpkg --get-selections | tr -s "\t" | cut -f1 | grep vim$)
-            if [ "$InstaVim" != "vim" ]; then
-                clear
-                echo "O VIM não foi instalado, atualize os repositórios! \"DPKG\""
-                sleep 5 && clear && exit 2
-            else
-                clear && echo "VIM, instalado com sucesso!" && sleep 4
-            fi
-            Bandeira=0
-        elif [ "$Resposta" -eq 2 ]; then
-            clear && echo "Saindo do \"luvim.sh\"..." && sleep 4 && clear
-            Bandeira=0
-        else
-            clear && echo "Resposta Inválida!" && sleep 4
-        fi
-    done
-fi
-#===============================================================================
+# Mensagem de ajuda.
+mensagem_ajuda="
+    USO : $(basename $0)\n\n
+    -h, --help\n
+    \tMostra esse painel de ajuda.\n
+    -V --version\n
+    \tMostra a versão do programa.\n
+    -i --install\n
+    \tInstala o VIM.\n
+    -c --config\n
+    \tConfigura o VIM, alterando o comportamento.\n
+    -t --theme\n
+    \tInstala o tema dracula.\n
+"
 
-#=== Cria o arquivo ~/.vimrc e os diretórios do VIM. ===#
-clear && echo "Criando arquivos e diretórios do VIM..." && sleep 4 && clear
+# Versão do programa.
+versao=$(grep "Versão" $0 | head -n1 | cut -d' ' -f2-)
 
-> ~/.vimrc # Cria arquivo ".vimrc".
-mkdir -p ~/.vim/colors/ # Cria o diretório "~/.vim/colors/".
-> ~/.vim/colors/dracula_x.vim # Cria o arquivo "dracula_x.vim".
-#===============================================================================
+# Coleta nome da distribuição.
+distro=$(hostnamectl status | \
+         grep -E "^Operating System" | \
+         cut -d: -f2 | \
+         tr [A-Z] [a-z] | \
+         cut -d' ' -f2)
 
-#=== Edita o arquivo ~/.vim/colors/dracula_x.vim ===#
-echo "
+# Distribuições.
+distros=(debian linuxmint ubuntu fedora arch)
+
+# Chaves.
+ch_online=0
+
+#=== Configurações do arquivo ~/.vimrc ===#
+vimrc="
+set tabstop=4         \" tabulação com 4 espaços.
+set expandtab         \" Troca tabulação por espaços.
+filetype on           \" Tenta detectar o tipo de arquivo.
+\" filetype indent on  \" Identação automatica.
+syntax on             \" Ativar o realce de sintaxe.
+set number            \" Numera as linhas.
+set cursorline        \" Deixa destacado a linha corespondente.
+set nowrap            \" Não quebrar linhas.
+set colorcolumn=80    \" Coluna vertical no caractere 80
+set termguicolors     \" Aceita esquema de cores em hexadecimal.
+"
+# colorscheme dracula_x \" Usa o tema dracula_x da pasta (~/.vim/colors).
+
+#=== Cria o arquivo ~/.vim/colors/dracula_x.vim ===#
+aplica_tema="colorscheme dracula_x"
+configuracao_tema="
 set background=dark
 
 hi clear
@@ -113,38 +133,212 @@ hi Error guifg=#ff2000 guibg=NONE gui=NONE cterm=underline
 \" Modo de visualização do VIM 
 hi Visual guifg=NONE guibg=#353744 gui=NONE cterm=italic
 
-" > ~/.vim/colors/dracula_x.vim
+"
 
-#===============================================================================
+#=== Funções ===#
+function verifica_internet() {
+    local internet=$(ping -c2 google.com 2> /dev/null)
+    if [ -z "$internet" ]; then
+        return 0 # Sem internet ou sem DNS configurado!
+    else
+        return 1 # Com internet.
+    fi
+}
 
-#=== Edita o arquivo ~/.vimrc ===#
-echo "
-set tabstop=4         \" tabulação com 4 espaços.
+function instala_vim() {
+    for i in ${distros[*]}; do
+        if [ $i = $distro ]; then
+            case $i in 
+                "debian" | "linuxmint" | "ubuntu")
+                    comando=$(sudo dpkg --get-selections | cut -f1 | \
+                              grep -E "^vim$")
+                    if [ $comando = "vim" ]; then
+                        echo "Erro : VIM já está instalado."
+                    else
+                        sudo apt update
+                        sudo apt install vim -y
+                    fi
+                ;;
+                
+                "fedora")
+                    comando=$(sudo dnf list | cut -f1 | grep -E "^vim$")
+                    if [ $comando = "vim" ]; then
+                        echo "Erro : VIM já está instalado."
+                    else
+                        sudo dnf update
+                        sudo dnf install vim -y
+                    fi
+                ;;
+                
+                "arch")
+                    comando=$(sudo pacman -Qq | grep -E "^vim$")
+                    if [ $comando = "vim" ]; then
+                        echo "Erro : VIM já está instalado."
+                    else
+                        sudo pacman -Sy
+                        sudo pacman -S vim --noconfirm
+                    fi
+                ;;
+                                
+                *)
+                    echo "Não é possivel instalar o VIM, tente manualmente."
+                    exit 3
+                    ;;
+            esac
+        fi
+    done
+}
 
-set expandtab         \" Troca tabulação por espaços.
+function configuracao() {
+    echo -e "$vimrc" > ~/.vimrc
+    sed -i "/^$/d" ~/.vimrc
 
-filetype on           \" Tenta detectar o tipo de arquivo.
+    if [ -f ~/.vim/colors/dracula_x.vim ]; then
+        echo "colorscheme dracula_x" >> ~/.vimrc
+    fi
+    echo "Configurações aplicadas."
+}
 
-\" filetype indent on  \" Identação automatica.
+function instala_tema() {
+    if [ -d ~/.vim/colors ]; then
+        echo -e "$configuracao_tema" > ~/.vim/colors/dracula_x.vim
+    else
+        mkdir -p ~/.vim/colors
+        echo -e "$configuracao_tema" > ~/.vim/colors/dracula_x.vim
+    fi
 
-syntax on             \" Ativar o realce de sintaxe.
+    comando_grep=$(grep -E "^colorscheme dracula_x$" ~/.vimrc | wc -l)
+    if [ $comando_grep -eq 0 ]; then
+        echo -e "$aplica_tema" >> ~/.vimrc
+    fi
 
-set number            \" Numera as linhas.
+    echo "Tema instalado!"
+}
 
-set cursorline        \" Deixa destacado a linha corespondente.
+#=== Funções 2 ===#
 
-set nowrap            \" Não quebrar linhas.
+# Case com 1 argumento.
+function um_argumento() {
+    case $1 in
+        -h | --help)
+            echo -e $mensagem_ajuda
+        ;;
+        
+        -V | --version)
+            echo $versao
+        ;;
+        
+        -i | --install)
+            verifica_internet ; ch_online=$?
+            [ $ch_online -eq 1 ] && instala_vim || echo "Sem Internet!"
+        ;;
+        
+        -c | --config)
+            
+            configuracao
+        ;;
 
-set colorcolumn=80    \" Coluna vertical no caractere 80
+        -t | --theme)
+            instala_tema
+        ;;
 
-set termguicolors     \" Aceita esquema de cores em hexadecimal.
+    esac
+}
 
-colorscheme dracula_x \" Usa o tema dracula_x da pasta (~/.vim/colors).
-" > ~/.vimrc # Envia todas essas informações para o arquivo ~/.vimrc
-clear && echo "Arquivos e diretórios criados!" && sleep 4 && clear
-#===============================================================================
+# Coleta de argumentos.
+function testa_argumentos() {
+    argumentos=()
 
-echo "Instalação finalizada!" && echo -e "\n"
-read -p "Aperte \"Enter\" para finaliza! " && clear
+    for i in $*; do
+        argumentos[${#argumentos[*]}]=$i
+    done
 
-# Fim do script.
+    # Testa se os argumentos são válidos.
+    argumentos_validos=0
+    for a in ${argumentos[*]}; do
+        for p in ${parametros[*]}; do
+            if [ $a == $p ]; then
+                argumentos_validos=$[$argumentos_validos + 1]
+            fi
+        done
+    done
+
+    # Testa se os argumentos são repetidos.
+    argumentos_repetidos=0
+    for a in ${argumentos[*]}; do
+        for i in ${argumentos[*]}; do
+            if [ $a = $i ]; then
+                argumentos_repetidos=$[$argumentos_repetidos + 1]        
+            fi
+        done
+        if [ $argumentos_repetidos -gt 1 ]; then
+            echo "Argumentos repetidos!"
+            exit 20
+        fi
+        argumentos_repetidos=0
+    done
+
+    # Testa a quantidade de argumentos válidos.
+    if [ $argumentos_validos -eq ${#argumentos[*]} ]; then
+        echo -n
+    else
+        if [ ${#argumentos[*]} -eq 1 ]; then
+            echo "Argumento inválido!"
+        else
+            echo "Argumentos inválidos!"
+        fi
+        exit 10
+    fi
+}
+
+# Case com 2 ou 3 argumentos.
+function mais_argumentos() {
+    argu_teste=()
+
+    for i in $*; do
+        argu_teste[${#argu_teste[*]}]=$i
+    done
+
+    for a in ${argu_teste[*]}; do
+        for i in $(seq 0 3); do
+            if [ $a = ${parametros[$i]} ]; then
+                echo "Argumentos inválidos!"
+                exit 50
+            fi
+        done
+    done
+
+    for a1 in ${argu_teste[*]}; do
+        if [ $a1 = "-i" ]; then
+            instala_vim
+        fi
+    done
+
+    for a2 in ${argu_teste[*]}; do
+        if [ $a2 = "-c" ]; then
+            configuracao
+        fi
+    done
+
+    for a3 in ${argu_teste[*]}; do
+        if [ $a3 = "-t" ]; then
+            instala_tema
+        fi
+    done
+
+}
+
+
+#=== Execução ===#
+testa_argumentos $*
+
+
+if [ $# -eq 0 ]; then
+    echo -e $mensagem_ajuda
+elif [ $# -eq 1 ]; then
+    um_argumento $1
+elif [ $# -gt 1 -a $# -lt 4 ]; then
+    mais_argumentos $*
+elif [ $# -gt 3 ]; then
+    echo "Argumentos em excesso!"
+fi
