@@ -161,8 +161,8 @@ function instala_vim() {
                 ;;
                 
                 "fedora")
-                    comando=$(sudo dnf list | cut -f1 | grep -E "^vim$")
-                    if [ $comando = "vim" ]; then
+                    
+                    if [ -f /usr/bin/vim ]; then
                         echo "Erro : VIM já está instalado."
                     else
                         sudo dnf update
