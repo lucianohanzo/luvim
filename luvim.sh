@@ -80,7 +80,7 @@ set background=dark
 hi clear
 
 \" Cor de fundo
-hi Normal guifg=NONE guibg=#282a36 gui=NONE cterm=NONE
+hi Normal guifg=NONE guibg=#222222 gui=NONE cterm=NONE
 
 \" Cor da linha da coluna vertical.
 hi ColorColumn guifg=NONE guibg=#2f313d gui=NONE cterm=NONE
