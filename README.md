@@ -3,8 +3,7 @@
 Esse é um arquivo para linux, criado em bash.
 
 <p>#=== Finalidade do script ===#</p>
-Esse script foi feito com a finalidade de melhorar o VIM, afim de melhor a 
-visualização, tabulação e cores.
+Esse script foi feito com a finalidade de melhorar o VIM, melhorando sua visualização, tabulação e cores.
 Deixando assim uma ambiente mais agradavel.
 
 <p>#=== Como executar ===#</p>
@@ -16,7 +15,6 @@ Depois execute o script.
 
 
 <p>#=== Observação final ===#</p>
-Importante ter internet, pois será instalado os pacotes VIM e GIT caso não
+Importante ter internet, pois será instalado os pacotes VIM caso não
 estejam instalados.
-Também será criado os arquivos ".vimrc" na pasta home do usuário e criado 
-algumas pastas no sistema.
+Também será criado os arquivos ".vimrc" na pasta home do usuário e ~/.vim/colors/dracula_x.vim.
