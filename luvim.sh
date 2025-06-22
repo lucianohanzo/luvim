@@ -70,7 +70,6 @@ set nowrap            \" Não quebrar linhas.
 set colorcolumn=80    \" Coluna vertical no caractere 80
 set termguicolors     \" Aceita esquema de cores em hexadecimal.
 "
-# colorscheme dracula_x \" Usa o tema dracula_x da pasta (~/.vim/colors).
 
 #=== Cria o arquivo ~/.vim/colors/dracula_x.vim ===#
 aplica_tema="colorscheme dracula_x"
@@ -132,7 +131,6 @@ hi Error guifg=#ff2000 guibg=NONE gui=NONE cterm=underline
 
 \" Modo de visualização do VIM 
 hi Visual guifg=NONE guibg=#353744 gui=NONE cterm=italic
-
 "
 
 #=== Funções ===#
@@ -189,6 +187,7 @@ function instala_vim() {
     done
 }
 
+# Alguns ajustes do VIM como tabulação e entre outros.
 function configuracao() {
     echo -e "$vimrc" > ~/.vimrc
     sed -i "/^$/d" ~/.vimrc
@@ -217,7 +216,7 @@ function instala_tema() {
 
 #=== Funções 2 ===#
 
-# Case com 1 argumento.
+# Função para caso o usuário coloque apenas um argumento.
 function um_argumento() {
     case $1 in
         -h | --help)
@@ -245,7 +244,7 @@ function um_argumento() {
     esac
 }
 
-# Coleta de argumentos.
+# Coleta e testa argumentos.
 function testa_argumentos() {
     argumentos=()
 
@@ -263,6 +262,18 @@ function testa_argumentos() {
         done
     done
 
+    # Testa a quantidade de argumentos válidos.
+    if [ $argumentos_validos -eq ${#argumentos[*]} ]; then
+        echo -n
+    else
+        if [ ${#argumentos[*]} -eq 1 ]; then
+            echo "Argumento inválido!"
+        else
+            echo "Argumentos inválidos!"
+        fi
+        exit 10
+    fi
+
     # Testa se os argumentos são repetidos.
     argumentos_repetidos=0
     for a in ${argumentos[*]}; do
@@ -277,18 +288,6 @@ function testa_argumentos() {
         fi
         argumentos_repetidos=0
     done
-
-    # Testa a quantidade de argumentos válidos.
-    if [ $argumentos_validos -eq ${#argumentos[*]} ]; then
-        echo -n
-    else
-        if [ ${#argumentos[*]} -eq 1 ]; then
-            echo "Argumento inválido!"
-        else
-            echo "Argumentos inválidos!"
-        fi
-        exit 10
-    fi
 }
 
 # Case com 2 ou 3 argumentos.
@@ -299,6 +298,7 @@ function mais_argumentos() {
         argu_teste[${#argu_teste[*]}]=$i
     done
 
+    # Não permite mais de um argumento com -h --help -V e --version.
     for a in ${argu_teste[*]}; do
         for i in $(seq 0 3); do
             if [ $a = ${parametros[$i]} ]; then
@@ -308,31 +308,32 @@ function mais_argumentos() {
         done
     done
 
+    # Caso use 3 argumentos, faz a instalação primeiro lugar.
     for a1 in ${argu_teste[*]}; do
         if [ $a1 = "-i" ]; then
             instala_vim
         fi
     done
 
+    # Caso use 3 argumentos, faz a configurção do VIM em segundo lugar.
     for a2 in ${argu_teste[*]}; do
         if [ $a2 = "-c" ]; then
             configuracao
         fi
     done
 
+    # Caso use 3 argumentos, instala o tema em treceiro lugar.
     for a3 in ${argu_teste[*]}; do
         if [ $a3 = "-t" ]; then
             instala_tema
         fi
     done
-
 }
-
 
 #=== Execução ===#
 testa_argumentos $*
 
-
+# Parte principal do programa.
 if [ $# -eq 0 ]; then
     echo -e $mensagem_ajuda
 elif [ $# -eq 1 ]; then
