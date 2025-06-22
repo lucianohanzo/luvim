@@ -31,13 +31,13 @@ mensagem_ajuda="
     USO : $(basename $0)\n\n
     -h, --help\n
     \tMostra esse painel de ajuda.\n
-    -V --version\n
+    -V, --version\n
     \tMostra a versão do programa.\n
-    -i --install\n
+    -i, --install\n
     \tInstala o VIM.\n
-    -c --config\n
+    -c, --config\n
     \tConfigura o VIM, alterando o comportamento.\n
-    -t --theme\n
+    -t, --theme\n
     \tInstala o tema dracula.\n
 "
 
