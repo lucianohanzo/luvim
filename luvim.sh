@@ -46,7 +46,7 @@ versao=$(grep "Versão" $0 | head -n1 | cut -d' ' -f2-)
 
 # Coleta nome da distribuição.
 distro=$(hostnamectl status | \
-         grep -E "^Operating System" | \
+         grep -E "Operating System" | \
          cut -d: -f2 | \
          tr [A-Z] [a-z] | \
          cut -d' ' -f2)
