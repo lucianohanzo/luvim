@@ -49,10 +49,12 @@ distro=$(hostnamectl status | \
          grep -E "Operating System" | \
          cut -d: -f2 | \
          tr [A-Z] [a-z] | \
-         cut -d' ' -f2)
+         cut -d' ' -f2-3)
 
-# Distribuições.
-distros=(debian linuxmint ubuntu fedora arch)
+
+nome_distro1=$(cut -d' ' -f1 <<< $distro)
+nome_distro2=$(cut -d' ' -f2 <<< $distro)
+
 
 # Chaves.
 ch_online=0
@@ -144,47 +146,36 @@ function verifica_internet() {
 }
 
 function instala_vim() {
-    for i in ${distros[*]}; do
-        if [ $i = $distro ]; then
-            case $i in 
-                "debian" | "linuxmint" | "ubuntu")
-                    comando=$(sudo dpkg --get-selections | cut -f1 | \
-                              grep -E "^vim$")
-                    if [ $comando = "vim" ]; then
-                        echo "Erro : VIM já está instalado."
-                    else
-                        sudo apt update
-                        sudo apt install vim -y
-                    fi
-                ;;
-                
-                "fedora")
-                    
-                    if [ -f /usr/bin/vim ]; then
-                        echo "Erro : VIM já está instalado."
-                    else
-                        sudo dnf update
-                        sudo dnf install vim -y
-                    fi
-                ;;
-                
-                "arch")
-                    comando=$(sudo pacman -Qq | grep -E "^vim$")
-                    if [ $comando = "vim" ]; then
-                        echo "Erro : VIM já está instalado."
-                    else
-                        sudo pacman -Sy
-                        sudo pacman -S vim --noconfirm
-                    fi
-                ;;
-                                
-                *)
-                    echo "Não é possivel instalar o VIM, tente manualmente."
-                    exit 3
-                    ;;
-            esac
-        fi
-    done
+	if [ "$nome_distro1" = "debian" -o "$nome_distro1" = "ubuntu" ] || \
+	   [ "$nome_distro1" = "linux" -a "$nome_distro2" = "mint" ]; then
+		comando=$(sudo dpkg --get-selections | cut -f1 | \
+		          grep -E "^vim$")
+		if [ $comando = "vim" ]; then
+		    echo "Erro : VIM já está instalado."
+		else
+		    sudo apt update
+		    sudo apt install vim -y
+		fi
+	
+    elif [ "$nome_distro1" = "fedora" ]; then
+        if [ -f /usr/bin/vim ]; then
+            echo "Erro : VIM já está instalado."
+        else
+            sudo dnf update
+            sudo dnf install vim -y
+    		fi          
+    elif [ "$nome_distro1" = "arch" -a "$nome_distro2" = "linux" ]; then
+        comando=$(sudo pacman -Qq | grep -E "^vim$")
+        if [ $comando = "vim" ]; then
+            echo "Erro : VIM já está instalado."
+        else
+            sudo pacman -Sy
+            sudo pacman -S vim --noconfirm
+		fi
+	else                    
+        echo "Não é possivel instalar o VIM, tente manualmente."
+        exit 3
+	fi
 }
 
 # Alguns ajustes do VIM como tabulação e entre outros.
@@ -215,7 +206,6 @@ function instala_tema() {
 }
 
 #=== Funções 2 ===#
-
 # Função para caso o usuário coloque apenas um argumento.
 function um_argumento() {
     case $1 in
@@ -233,7 +223,6 @@ function um_argumento() {
         ;;
         
         -c | --config)
-            
             configuracao
         ;;
 
@@ -290,7 +279,7 @@ function testa_argumentos() {
     done
 }
 
-# Case com 2 ou 3 argumentos.
+# Função para 2 ou 3 argumentos.
 function mais_argumentos() {
     argu_teste=()
 
@@ -310,21 +299,21 @@ function mais_argumentos() {
 
     # Caso use 3 argumentos, faz a instalação primeiro lugar.
     for a1 in ${argu_teste[*]}; do
-        if [ $a1 = "-i" ]; then
+        if [ $a1 = "-i" -o $a1 = "--install" ]; then
             instala_vim
         fi
     done
 
     # Caso use 3 argumentos, faz a configurção do VIM em segundo lugar.
     for a2 in ${argu_teste[*]}; do
-        if [ $a2 = "-c" ]; then
+        if [ $a2 = "-c" -o $a2 = "--config" ]; then
             configuracao
         fi
     done
 
     # Caso use 3 argumentos, instala o tema em treceiro lugar.
     for a3 in ${argu_teste[*]}; do
-        if [ $a3 = "-t" ]; then
+        if [ $a3 = "-t" -o $a3 = "--theme" ]; then
             instala_tema
         fi
     done
